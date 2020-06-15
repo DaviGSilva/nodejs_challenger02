@@ -9,9 +9,11 @@ class CreateTransactionService {
   }
 
   public execute({title, value, type}: Omit<Transaction, 'id'>): Transaction {
-    const balance = this.transactionsRepository.getBalance();
+    if (!['income', 'outcome'].includes(type)) throw Error('Invalid transaction type');
 
-    if (type === 'outcome' && balance.total < value) throw Error('Outcome value exceeds total value');
+    const { total } = this.transactionsRepository.getBalance();
+
+    if (type === 'outcome' && total < value) throw Error('Outcome value exceeds total value');
 
     const transaction = this.transactionsRepository.create({
       title, value, type
