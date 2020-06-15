@@ -24,14 +24,23 @@ class TransactionsRepository {
   }
 
   public getBalance(): Balance {
-    const income = this.transactions.reduce(
-      (accum, curr) => curr.type === 'income' ? accum + curr.value : accum,
-      0
+    const { income, outcome } = this.transactions.reduce(
+      (accum, curr) => {
+        if (curr.type === 'income') {
+          accum.income += curr.value;
+        }
+        else if (curr.type === 'outcome') {
+          accum.outcome += curr.value;
+        }
+
+        return accum;
+      },
+      {
+        income : 0,
+        outcome: 0,
+      }
     );
-    const outcome = this.transactions.reduce(
-      (accum, curr) => curr.type === 'outcome' ? accum + curr.value : accum,
-      0
-    );
+
     const total = income - outcome;
 
     return {
